@@ -35,6 +35,24 @@
     self.switchMenu.delegate = self;
     
     [self createSubmenuOfSwitchMenu];
+    
+    [self changeMenuTitle];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(notify:) name:NSWorkspaceDidActivateApplicationNotification object:nil];
+}
+
+- (void)notify:(NSNotification *)notification
+{
+    [self changeMenuTitle];
+}
+
+- (void)changeMenuTitle
+{
+    for (NSRunningApplication *app in self.apps) {
+        if (app.ownsMenuBar) {
+            self.sbItem.title = app.localizedName;
+            break;
+        }
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
