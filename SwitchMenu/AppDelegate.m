@@ -70,6 +70,13 @@
         item.tag = i;
         item.image = app.icon;
         item.action = @selector(menuSelected:);
+        if (app.ownsMenuBar) {
+            item.state = NSOnState;
+        } else if (app.isHidden) {
+            item.state = NSMixedState;
+        } else {
+            item.state = NSOffState;
+        }
         
         [self.apps addObject:app];
         [self.switchMenu addItem:item];
@@ -92,9 +99,7 @@
     NSInteger tag = item.tag;
     
     NSRunningApplication *app = [self.apps objectAtIndex:tag];
-    NSString *identifier = app.bundleIdentifier;
-    app = [NSRunningApplication runningApplicationsWithBundleIdentifier:identifier][0];
-    [app activateWithOptions:0];
+    [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
 }
 
 @end
