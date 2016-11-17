@@ -11,6 +11,10 @@
 @interface AppDelegate ()
 
 @property (weak) IBOutlet NSWindow *window;
+@property (weak) IBOutlet NSMenuItem *miOptions;
+
+@property (assign) NSInteger iMenuTitle;
+@property (assign) NSInteger iIconSmall;
 
 @property (strong, retain) NSStatusItem *sbItem;
 @property (strong, retain) NSMutableArray *apps;
@@ -49,7 +53,36 @@
 {
     for (NSRunningApplication *app in self.apps) {
         if (app.ownsMenuBar) {
-            self.sbItem.title = app.localizedName;
+           
+            switch (self.iMenuTitle) {
+                case 0: {
+                    self.sbItem.title = app.localizedName;
+                    self.sbItem.image = nil;
+                    break;
+                }
+                case 1: {
+                    self.sbItem.title = @"";
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
+                    break;
+                }
+                case 2: {
+                    self.sbItem.title = @"";
+                    self.sbItem.image = app.icon;
+                    break;
+                }
+                case 3: {
+                    self.sbItem.title = app.localizedName;
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
+                    break;
+                }
+                case 4: {
+                    self.sbItem.title = app.localizedName;
+                    self.sbItem.image = app.icon;
+                    break;
+                }
+                default:
+                    break;
+            }
             break;
         }
     }
@@ -66,6 +99,8 @@
 }
 
 - (void)createSubmenuOfSwitchMenu {
+    NSMenuItem *options = self.miOptions;
+    
     [self.switchMenu removeAllItems];
     
     self.apps = [[NSMutableArray alloc] init];
@@ -86,7 +121,12 @@
         NSMenuItem *item = [[NSMenuItem alloc] init];
         item.title = app.localizedName;
         item.tag = i;
-        item.image = app.icon;
+        
+        if (self.iIconSmall) {
+            item.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
+        } else {
+            item.image = app.icon;
+        }
         item.action = @selector(menuSelected:);
         if (app.ownsMenuBar) {
             item.state = NSOnState;
@@ -103,13 +143,7 @@
     }
     
     [self.switchMenu addItem:[NSMenuItem separatorItem]];
-    
-    NSMenuItem *item = [[NSMenuItem alloc] init];
-    item.title = @"Quit SwitchMenu";
-    item.target = [NSApplication sharedApplication];
-    item.action = @selector(terminate:);
-    
-    [self.switchMenu addItem:item];
+    [self.switchMenu addItem:options];
 }
 
 - (void)menuSelected:(id)sender {
@@ -118,6 +152,32 @@
     
     NSRunningApplication *app = [self.apps objectAtIndex:tag];
     [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+}
+
+- (IBAction)setMenuTitle:(NSMenuItem *)sender {
+    self.iMenuTitle = sender.tag;
+    [self changeMenuTitle];
+    [self createSubmenuOfSwitchMenu];
+}
+
+- (IBAction)setIconSmall:(NSMenuItem *)sender {
+    self.iIconSmall = sender.tag;
+    [self changeMenuTitle];
+    [self createSubmenuOfSwitchMenu];
+}
+
++ (NSImage *)resizeImage:(NSImage *)image small:(BOOL)small monochrome:(BOOL)monochrome translucent:(BOOL)translucent {
+    NSImage *resultImage = [image copy];
+    
+    if (small) {
+        NSImage *tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(20, 20)];
+        [tmpImage lockFocus];
+        [resultImage drawInRect:NSMakeRect(0, 0, tmpImage.size.width, tmpImage.size.height)];
+        [tmpImage unlockFocus];
+        resultImage = tmpImage;
+    }
+    
+    return resultImage;
 }
 
 @end

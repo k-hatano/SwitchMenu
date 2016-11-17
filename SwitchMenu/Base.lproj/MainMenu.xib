@@ -14,6 +14,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="miOptions" destination="E0w-1m-I95" id="RJe-MX-Rcc"/>
                 <outlet property="switchMenu" destination="yLx-0K-94h" id="RUF-J0-XcN"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -680,9 +681,60 @@
         </window>
         <menu id="yLx-0K-94h">
             <items>
-                <menuItem title="Option" id="E0w-1m-I95">
-                    <menu key="submenu" title="Option" id="Mpu-Ew-pDv">
+                <menuItem isSeparatorItem="YES" id="IKw-je-jbb"/>
+                <menuItem title="Options" id="E0w-1m-I95">
+                    <menu key="submenu" title="Options" id="Mpu-Ew-pDv">
                         <items>
+                            <menuItem title="Menu Title" enabled="NO" id="8Pm-nD-aMw">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Application Name" state="on" id="gcT-x2-bUe">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="Qsi-Bj-o1E"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Icon" tag="1" id="qTs-WN-dBC">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="dwh-7k-wIT"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Icon (Monochrome)" tag="2" id="a7A-ac-S7b">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="4jN-Jm-ZfX"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Both Application Name And Icon" tag="3" id="G4Z-eH-z1E">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="DmO-Fz-4c9"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Both Application Name And Icon (Monochrome)" tag="4" id="e6d-rC-hXz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="AFU-n3-DRu"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="CYa-uN-xFL"/>
+                            <menuItem title="Application Icons" enabled="NO" id="lN1-go-d0M">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="Large" state="on" id="OAF-AD-vdi">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setIconSmall:" target="Voe-Tx-rLC" id="ikd-Oq-zr6"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Small" tag="1" id="bJh-cK-ohH">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setIconSmall:" target="Voe-Tx-rLC" id="j3m-yM-bN2"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Jrt-Os-hKD"/>
                             <menuItem title="Quit SwitchMenu" id="bpS-ey-YW8">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -692,12 +744,11 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="MnO-9r-9lp"/>
             </items>
             <connections>
                 <outlet property="delegate" destination="-2" id="Db0-MA-GtS"/>
             </connections>
-            <point key="canvasLocation" x="553.5" y="752.5"/>
+            <point key="canvasLocation" x="540" y="783.5"/>
         </menu>
     </objects>
 </document>
