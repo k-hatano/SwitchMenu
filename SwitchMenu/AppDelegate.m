@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "NSImage+Grayscale.h"
 
 @interface AppDelegate ()
 
@@ -24,6 +25,7 @@
 @property (weak) IBOutlet NSMenuItem *miMenuTitleAppNameIconMono;
 @property (weak) IBOutlet NSMenuItem *miAppIconLarge;
 @property (weak) IBOutlet NSMenuItem *miAppIconSmall;
+@property (weak) IBOutlet NSMenuItem *miAppIconSmallMono;
 
 @property (assign) NSInteger iMenuTitle;
 @property (assign) NSInteger iIconSmall;
@@ -53,13 +55,23 @@
     [self createSubmenuOfSwitchMenu];
     
     [self changeMenuTitle];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(notify:) name:NSWorkspaceDidActivateApplicationNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(applicationDidActive:) name:NSWorkspaceDidActivateApplicationNotification object:nil];
 }
 
-- (void)notify:(NSNotification *)notification
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
+}
+
+- (void)applicationDidActive:(NSNotification *)notification
 {
     [self createSubmenuOfSwitchMenu];
     [self changeMenuTitle];
+}
+
+- (void)menuWillOpen:(NSMenu *)menu {
+    if (menu == self.switchMenu)  {
+        [self createSubmenuOfSwitchMenu];
+    }
 }
 
 - (void)changeMenuTitle
@@ -75,22 +87,26 @@
                 }
                 case 1: {
                     self.sbItem.title = @"";
-                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
+                                                      monochrome:NO translucent:NO];
                     break;
                 }
                 case 2: {
                     self.sbItem.title = @"";
-                    self.sbItem.image = app.icon;
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
+                                                      monochrome:YES translucent:NO];
                     break;
                 }
                 case 3: {
                     self.sbItem.title = app.localizedName;
-                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
+                                                      monochrome:NO translucent:NO];
                     break;
                 }
                 case 4: {
                     self.sbItem.title = app.localizedName;
-                    self.sbItem.image = app.icon;
+                    self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
+                                                      monochrome:YES translucent:NO];
                     break;
                 }
                 default:
@@ -98,16 +114,6 @@
             }
             break;
         }
-    }
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-}
-
-- (void)menuWillOpen:(NSMenu *)menu {
-    if (menu == self.switchMenu)  {
-        [self createSubmenuOfSwitchMenu];
     }
 }
 
@@ -151,7 +157,26 @@
             translucent = YES;
         }
         
-        item.image = [AppDelegate resizeImage:app.icon small:self.iIconSmall monochrome:NO translucent:translucent];
+        switch (self.iIconSmall) {
+            case 0: {
+                item.image = [AppDelegate resizeImage:app.icon small:NO
+                                           monochrome:NO translucent:translucent];
+                break;
+            }
+            case 1: {
+                item.image = [AppDelegate resizeImage:app.icon small:YES
+                                           monochrome:NO translucent:translucent];
+                break;
+            }
+            case 2: {
+                item.image = [AppDelegate resizeImage:app.icon small:YES
+                                           monochrome:YES translucent:translucent];
+                break;
+            }
+            default:
+                break;
+        }
+        
         item.action = @selector(menuSelected:);
         if (app.ownsMenuBar) {
             item.state = NSOnState;
@@ -194,30 +219,8 @@
     [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
 }
 
-- (IBAction)setMenuTitle:(NSMenuItem *)sender {
-    self.iMenuTitle = sender.tag;
-    
-    self.miMenuTitleAppName.state = self.iMenuTitle == 0 ? NSOnState : NSOffState;
-    self.miMenuTitleIcon.state = self.iMenuTitle == 1 ? NSOnState : NSOffState;
-    self.miMenuTitleIconMono.state = self.iMenuTitle == 2 ? NSOnState : NSOffState;
-    self.miMenuTitleAppNameIcon.state = self.iMenuTitle == 3 ? NSOnState : NSOffState;
-    self.miMenuTitleAppNameIconMono.state = self.iMenuTitle == 4 ? NSOnState : NSOffState;
-    
-    [self changeMenuTitle];
-    [self createSubmenuOfSwitchMenu];
-}
-
-- (IBAction)setIconSmall:(NSMenuItem *)sender {
-    self.iIconSmall = sender.tag;
-    
-    self.miAppIconLarge.state = self.iIconSmall == 0 ? NSOnState : NSOffState;
-    self.miAppIconSmall.state = self.iIconSmall == 1 ? NSOnState : NSOffState;
-    
-    [self changeMenuTitle];
-    [self createSubmenuOfSwitchMenu];
-}
-
-+ (NSImage *)resizeImage:(NSImage *)image small:(BOOL)small monochrome:(BOOL)monochrome translucent:(BOOL)translucent {
++ (NSImage *)resizeImage:(NSImage *)image small:(BOOL)small
+              monochrome:(BOOL)monochrome translucent:(BOOL)translucent {
     NSImage *resultImage = [image copy];
     NSImage *tmpImage;
     
@@ -235,7 +238,38 @@
     [tmpImage unlockFocus];
     resultImage = tmpImage;
     
+    if (monochrome) {
+        resultImage = [resultImage grayscaleImage];
+    }
+    
     return resultImage;
+}
+
+
+#pragma mark - IBAction
+
+- (IBAction)setMenuTitle:(NSMenuItem *)sender {
+    self.iMenuTitle = sender.tag;
+    
+    self.miMenuTitleAppName.state           = self.iMenuTitle == 0 ? NSOnState : NSOffState;
+    self.miMenuTitleIcon.state              = self.iMenuTitle == 1 ? NSOnState : NSOffState;
+    self.miMenuTitleIconMono.state          = self.iMenuTitle == 2 ? NSOnState : NSOffState;
+    self.miMenuTitleAppNameIcon.state       = self.iMenuTitle == 3 ? NSOnState : NSOffState;
+    self.miMenuTitleAppNameIconMono.state   = self.iMenuTitle == 4 ? NSOnState : NSOffState;
+    
+    [self changeMenuTitle];
+    [self createSubmenuOfSwitchMenu];
+}
+
+- (IBAction)setIconSmall:(NSMenuItem *)sender {
+    self.iIconSmall = sender.tag;
+    
+    self.miAppIconLarge.state       = self.iIconSmall == 0 ? NSOnState : NSOffState;
+    self.miAppIconSmall.state       = self.iIconSmall == 1 ? NSOnState : NSOffState;
+    self.miAppIconSmallMono.state   = self.iIconSmall == 2 ? NSOnState : NSOffState;
+    
+    [self changeMenuTitle];
+    [self createSubmenuOfSwitchMenu];
 }
 
 - (IBAction)actionHideApp:(id)sender {

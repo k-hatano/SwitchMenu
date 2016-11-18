@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1108" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -17,6 +17,7 @@
                 <outlet property="miActions" destination="uMv-bq-eAJ" id="USh-EU-adm"/>
                 <outlet property="miAppIconLarge" destination="OAF-AD-vdi" id="h8O-PQ-x3m"/>
                 <outlet property="miAppIconSmall" destination="bJh-cK-ohH" id="lpj-2Z-woU"/>
+                <outlet property="miAppIconSmallMono" destination="nlZ-ei-3A2" id="vyI-Ot-zdF"/>
                 <outlet property="miHideApp" destination="Xqw-HY-SFm" id="hVJ-GJ-CPr"/>
                 <outlet property="miHideOthers" destination="WIX-8J-irt" id="ph5-8a-LD1"/>
                 <outlet property="miMenuTitleAppName" destination="gcT-x2-bUe" id="ZcX-b9-bAZ"/>
@@ -685,7 +686,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="480" height="360"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1366" height="745"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="360"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -776,6 +777,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setIconSmall:" target="Voe-Tx-rLC" id="j3m-yM-bN2"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Small (Monochrome)" tag="2" id="nlZ-ei-3A2">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setIconSmall:" target="Voe-Tx-rLC" id="JhN-LA-ujD"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Jrt-Os-hKD"/>
