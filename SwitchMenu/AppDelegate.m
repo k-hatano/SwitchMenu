@@ -12,6 +12,13 @@
 
 @property (weak) IBOutlet NSWindow *window;
 @property (weak) IBOutlet NSMenuItem *miOptions;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleAppName;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleIcon;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleIconMono;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleAppNameIcon;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleAppNameIconMono;
+@property (weak) IBOutlet NSMenuItem *miAppIconLarge;
+@property (weak) IBOutlet NSMenuItem *miAppIconSmall;
 
 @property (assign) NSInteger iMenuTitle;
 @property (assign) NSInteger iIconSmall;
@@ -122,16 +129,15 @@
         item.title = app.localizedName;
         item.tag = i;
         
-        if (self.iIconSmall) {
-            item.image = [AppDelegate resizeImage:app.icon small:YES monochrome:NO translucent:NO];
-        } else {
-            item.image = app.icon;
+        BOOL translucent = NO;
+        if (app.isHidden) {
+            translucent = YES;
         }
+        
+        item.image = [AppDelegate resizeImage:app.icon small:self.iIconSmall monochrome:NO translucent:translucent];
         item.action = @selector(menuSelected:);
         if (app.ownsMenuBar) {
             item.state = NSOnState;
-        } else if (app.isHidden) {
-            item.state = NSMixedState;
         } else {
             item.state = NSOffState;
         }
@@ -158,24 +164,40 @@
     self.iMenuTitle = sender.tag;
     [self changeMenuTitle];
     [self createSubmenuOfSwitchMenu];
+    
+    self.miMenuTitleAppName.state = self.iMenuTitle == 0 ? NSOnState : NSOffState;
+    self.miMenuTitleIcon.state = self.iMenuTitle == 1 ? NSOnState : NSOffState;
+    self.miMenuTitleIconMono.state = self.iMenuTitle == 2 ? NSOnState : NSOffState;
+    self.miMenuTitleAppNameIcon.state = self.iMenuTitle == 3 ? NSOnState : NSOffState;
+    self.miMenuTitleAppNameIconMono.state = self.iMenuTitle == 4 ? NSOnState : NSOffState;
 }
 
 - (IBAction)setIconSmall:(NSMenuItem *)sender {
     self.iIconSmall = sender.tag;
     [self changeMenuTitle];
     [self createSubmenuOfSwitchMenu];
+    
+    self.miAppIconLarge.state = self.iIconSmall == 0 ? NSOnState : NSOffState;
+    self.miAppIconSmall.state = self.iIconSmall == 1 ? NSOnState : NSOffState;
 }
 
 + (NSImage *)resizeImage:(NSImage *)image small:(BOOL)small monochrome:(BOOL)monochrome translucent:(BOOL)translucent {
     NSImage *resultImage = [image copy];
+    NSImage *tmpImage;
     
     if (small) {
-        NSImage *tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(20, 20)];
-        [tmpImage lockFocus];
-        [resultImage drawInRect:NSMakeRect(0, 0, tmpImage.size.width, tmpImage.size.height)];
-        [tmpImage unlockFocus];
-        resultImage = tmpImage;
+        tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(20, 20)];
+    } else {
+        tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(image.size.width, image.size.height)];
     }
+    
+    [tmpImage lockFocus];
+    [resultImage drawInRect:NSMakeRect(0, 0, tmpImage.size.width, tmpImage.size.height)
+                   fromRect:NSMakeRect(0, 0, resultImage.size.width, resultImage.size.height)
+                  operation:NSCompositeSourceOver
+                   fraction:translucent ? 0.3f : 1.0f];
+    [tmpImage unlockFocus];
+    resultImage = tmpImage;
     
     return resultImage;
 }
