@@ -14,14 +14,19 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="miActions" destination="uMv-bq-eAJ" id="USh-EU-adm"/>
                 <outlet property="miAppIconLarge" destination="OAF-AD-vdi" id="h8O-PQ-x3m"/>
                 <outlet property="miAppIconSmall" destination="bJh-cK-ohH" id="lpj-2Z-woU"/>
+                <outlet property="miHideApp" destination="Xqw-HY-SFm" id="hVJ-GJ-CPr"/>
+                <outlet property="miHideOthers" destination="WIX-8J-irt" id="ph5-8a-LD1"/>
                 <outlet property="miMenuTitleAppName" destination="gcT-x2-bUe" id="ZcX-b9-bAZ"/>
                 <outlet property="miMenuTitleAppNameIcon" destination="G4Z-eH-z1E" id="6Y3-sc-SQw"/>
                 <outlet property="miMenuTitleAppNameIconMono" destination="e6d-rC-hXz" id="ZED-vg-mUT"/>
                 <outlet property="miMenuTitleIcon" destination="qTs-WN-dBC" id="cZP-4R-Xam"/>
                 <outlet property="miMenuTitleIconMono" destination="a7A-ac-S7b" id="8aN-mG-UUz"/>
                 <outlet property="miOptions" destination="E0w-1m-I95" id="RJe-MX-Rcc"/>
+                <outlet property="miQuitApp" destination="UY7-mP-BSk" id="tjq-ph-oPn"/>
+                <outlet property="miShowAll" destination="0pC-wN-3TZ" id="Lw1-JK-rfa"/>
                 <outlet property="switchMenu" destination="yLx-0K-94h" id="RUF-J0-XcN"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -689,6 +694,38 @@
         <menu id="yLx-0K-94h">
             <items>
                 <menuItem isSeparatorItem="YES" id="IKw-je-jbb"/>
+                <menuItem title="Actions" id="uMv-bq-eAJ">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Actions" id="I5s-zn-mp9">
+                        <items>
+                            <menuItem title="Hide" id="Xqw-HY-SFm">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="actionHideApp:" target="Voe-Tx-rLC" id="NlG-VX-QJf"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" id="WIX-8J-irt">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="actionHideOthers:" target="Voe-Tx-rLC" id="qNY-3N-fNw"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="0pC-wN-3TZ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="actionShowAll:" target="Voe-Tx-rLC" id="ng6-c4-Um9"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Pn6-te-7jO"/>
+                            <menuItem title="Quit" id="UY7-mP-BSk">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="actionQuitApp:" target="Voe-Tx-rLC" id="tZ0-Qk-e0T"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Options" id="E0w-1m-I95">
                     <menu key="submenu" title="Options" id="Mpu-Ew-pDv">
                         <items>
