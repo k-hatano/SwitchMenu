@@ -141,6 +141,10 @@
                                monochrome:(self.iIconSmall == 2 ? YES : NO)
                               translucent:NO];
     
+    NSMutableString *tooltip = [[NSMutableString alloc] init];
+    [tooltip appendFormat:@"Full Path:\n%@\n",path];
+    item.toolTip = tooltip;
+    
     return item;
 }
 
@@ -299,6 +303,14 @@
         } else {
             item.state = NSOffState;
         }
+        
+        NSMutableString *tooltip = [[NSMutableString alloc] init];
+        [tooltip appendFormat:@"Full Path:\n%@\n",[app.bundleURL path]];
+        [tooltip appendFormat:@"\nBundle Identifier:\n%@\n",app.bundleIdentifier];
+        if (app.launchDate) {
+            [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n",app.launchDate];
+        }
+        item.toolTip = tooltip;
         
         [self.apps addObject:app];
         [self.switchMenu addItem:item];
