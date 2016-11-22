@@ -24,6 +24,7 @@
 		4A49F0241DDB17320085266F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A49F0271DDB17320085266F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		4A49F0291DDB17320085266F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4AF57D011DE43A1C005796F3 /* ja */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ja; path = ja.lproj/MainMenu.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +159,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				4A49F0271DDB17320085266F /* Base */,
+				4AF57D011DE43A1C005796F3 /* ja */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
