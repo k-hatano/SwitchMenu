@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 #import "NSImage+Grayscale.h"
 
+#define SMALL_ICON_WIDTH 19
+
 #define SWITCHMENU_ITEMS_FOLDER_PATH @"~/Library/SwitchMenu Items/"
 
 @interface AppDelegate ()
@@ -127,11 +129,29 @@
     }
 }
 
+- (NSMenuItem *)menuItemForFileName:(NSString *)fileName FilePath:(NSString *)path tag:(NSInteger)tag {
+    NSMenuItem *item = [[NSMenuItem alloc] init];
+    item.title = fileName;
+    item.tag = tag;
+    item.target = self;
+    item.action = @selector(selectSwitchMenuFolderItem:);
+    
+    item.image = [AppDelegate resizeImage:[[NSWorkspace sharedWorkspace] iconForFile:path]
+                                    small:(self.iIconSmall == 1 || self.iIconSmall == 2 ? YES : NO)
+                               monochrome:(self.iIconSmall == 2 ? YES : NO)
+                              translucent:NO];
+    
+    return item;
+}
+
 - (void)createSubmenuOfSwitchMenu {
     NSMenuItem *actions = self.miActions;
     NSMenuItem *options = self.miOptions;
     BOOL enableShowAll = NO;
     BOOL enableHideOthers = NO;
+    
+    NSMutableArray *submenus = [[NSMutableArray alloc] init];
+    NSMutableArray *submenuPaths = [[NSMutableArray alloc] init];
     
     [self.switchMenu removeAllItems];
     
@@ -145,30 +165,65 @@
             if ([fileName rangeOfString:@"."].location == 0) {
                 continue;
             }
-            
-            NSMenuItem *item = [[NSMenuItem alloc] init];
-            item.title = fileName;
-            item.tag = tag;
-            item.target = self;
-            item.action = @selector(selectSwitchMenuFolderItem:);
-            
             NSString *path = [[folderPath stringByAppendingString:@"/"] stringByAppendingString:fileName];
             
-            item.image = [AppDelegate resizeImage:[[NSWorkspace sharedWorkspace] iconForFile:path]
-                                            small:(self.iIconSmall == 1 || self.iIconSmall == 2 ? YES : NO)
-                                       monochrome:(self.iIconSmall == 2 ? YES : NO)
-                                      translucent:NO];
+            NSMenuItem *item = [self menuItemForFileName:fileName FilePath:path tag:tag];
             
-            [self.items addObject:fileName];
+            BOOL isDirectory;
+            [fileManager fileExistsAtPath:path isDirectory:&isDirectory];
+            if (isDirectory) {
+                NSMenu *menu = [[NSMenu alloc] init];
+                item.submenu = menu;
+                [submenuPaths addObject:path];
+                [submenus addObject:menu];
+            }
+            
+            [self.items addObject:path];
             [self.switchMenu addItem:item];
             tag++;
         }
+        
+        while ([submenus count] > 0) {
+            NSString *folderPath = submenuPaths[0];
+            NSMenu *submenu = submenus[0];
+            
+            [submenus removeObjectAtIndex:0];
+            [submenuPaths removeObjectAtIndex:0];
+            
+            NSArray *menuItems = [fileManager contentsOfDirectoryAtPath:folderPath error:NULL];
+            if (menuItems && [menuItems count] > 0) {
+                for (NSString *fileName in menuItems) {
+                    if ([fileName rangeOfString:@"."].location == 0) {
+                        continue;
+                    }
+                    NSString *path = [[folderPath stringByAppendingString:@"/"] stringByAppendingString:fileName];
+                    
+                    NSMenuItem *item = [self menuItemForFileName:fileName FilePath:path tag:tag];
+                    
+                    BOOL isDirectory;
+                    [fileManager fileExistsAtPath:path isDirectory:&isDirectory];
+                    if (isDirectory) {
+                        NSMenu *menu = [[NSMenu alloc] init];
+                        item.submenu = menu;
+                        [submenuPaths addObject:path];
+                        [submenus addObject:menu];
+                    }
+                    
+                    [self.items addObject:path];
+                    [submenu addItem:item];
+                    tag++;
+                }
+            } else {
+                NSMenuItem *item = [[NSMenuItem alloc] init];
+                item.title = @"No Items";
+                [submenu addItem:item];
+            }
+        }
+        
         if ([self.items count] > 0) {
             [self.switchMenu addItem:[NSMenuItem separatorItem]];
         }
     }
-    
-    
     
     self.apps = [[NSMutableArray alloc] init];
     
@@ -286,7 +341,7 @@
     NSImage *tmpImage;
     
     if (small) {
-        tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(20, 20)];
+        tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(SMALL_ICON_WIDTH, SMALL_ICON_WIDTH)];
     } else {
         tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(image.size.width, image.size.height)];
     }
@@ -404,9 +459,11 @@
 
 - (IBAction)openSwitchMenuItemsFolder:(id)sender {
     NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
+    BOOL result = [[NSFileManager defaultManager] fileExistsAtPath:folderPath];
     
-    BOOL result = [[NSWorkspace sharedWorkspace] openFile:folderPath];
-    if (!result) {
+    if (result) {
+        [[NSWorkspace sharedWorkspace] openFile:folderPath];
+    } else {
         NSAlert *alert = [NSAlert alertWithMessageText:@"SwitchMenu Items Folder doesn't exist."
                                          defaultButton:@"OK"
                                        alternateButton:@"Cancel"
@@ -430,8 +487,7 @@
     NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
     
     NSInteger tag = ((NSMenuItem *)sender).tag;
-    NSString *fileName = self.items[tag];
-    NSString *filePath = [[folderPath stringByAppendingString:@"/"] stringByAppendingString:fileName];
+    NSString *filePath = self.items[tag];
     [[NSWorkspace sharedWorkspace] openFile:filePath];
 }
 
