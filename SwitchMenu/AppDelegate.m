@@ -38,6 +38,8 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    [self loadUserDefaults];
+    
     NSStatusBar *bar = [NSStatusBar systemStatusBar];
     
     {
@@ -53,8 +55,9 @@
     self.switchMenu.delegate = self;
     
     [self createSubmenuOfSwitchMenu];
-    
+    [self recheckMenuItems];
     [self changeMenuTitle];
+    
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(applicationDidActive:) name:NSWorkspaceDidActivateApplicationNotification object:nil];
 }
 
@@ -245,31 +248,53 @@
     return resultImage;
 }
 
+#pragma mark - User Defaults
 
-#pragma mark - IBAction
+#define UD [NSUserDefaults standardUserDefaults]
+#define UDMenuTitle @"MenuTitle"
+#define UDIconSmall @"IconSmall"
 
-- (IBAction)setMenuTitle:(NSMenuItem *)sender {
-    self.iMenuTitle = sender.tag;
-    
+- (void)loadUserDefaults {
+    self.iMenuTitle = [UD integerForKey:UDMenuTitle];
+    self.iIconSmall = [UD integerForKey:UDIconSmall];
+}
+
+- (void)saveUserDefaults {
+    [UD setInteger:self.iMenuTitle forKey:UDMenuTitle];
+    [UD setInteger:self.iIconSmall forKey:UDIconSmall];
+}
+
+- (void)recheckMenuItems {
     self.miMenuTitleAppName.state           = self.iMenuTitle == 0 ? NSOnState : NSOffState;
     self.miMenuTitleIcon.state              = self.iMenuTitle == 1 ? NSOnState : NSOffState;
     self.miMenuTitleIconMono.state          = self.iMenuTitle == 2 ? NSOnState : NSOffState;
     self.miMenuTitleAppNameIcon.state       = self.iMenuTitle == 3 ? NSOnState : NSOffState;
     self.miMenuTitleAppNameIconMono.state   = self.iMenuTitle == 4 ? NSOnState : NSOffState;
     
+    self.miAppIconLarge.state       = self.iIconSmall == 0 ? NSOnState : NSOffState;
+    self.miAppIconSmall.state       = self.iIconSmall == 1 ? NSOnState : NSOffState;
+    self.miAppIconSmallMono.state   = self.iIconSmall == 2 ? NSOnState : NSOffState;
+}
+
+
+#pragma mark - IBAction
+
+- (IBAction)setMenuTitle:(NSMenuItem *)sender {
+    self.iMenuTitle = sender.tag;
+    
     [self changeMenuTitle];
+    [self recheckMenuItems];
     [self createSubmenuOfSwitchMenu];
+    [self saveUserDefaults];
 }
 
 - (IBAction)setIconSmall:(NSMenuItem *)sender {
     self.iIconSmall = sender.tag;
     
-    self.miAppIconLarge.state       = self.iIconSmall == 0 ? NSOnState : NSOffState;
-    self.miAppIconSmall.state       = self.iIconSmall == 1 ? NSOnState : NSOffState;
-    self.miAppIconSmallMono.state   = self.iIconSmall == 2 ? NSOnState : NSOffState;
-    
     [self changeMenuTitle];
+    [self recheckMenuItems];
     [self createSubmenuOfSwitchMenu];
+    [self saveUserDefaults];
 }
 
 - (IBAction)actionHideApp:(id)sender {
