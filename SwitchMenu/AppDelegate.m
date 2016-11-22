@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 #import "NSImage+Grayscale.h"
 
+#define SWITCHMENU_ITEMS_FOLDER_PATH @"~/Library/SwitchMenu Items/"
+
 @interface AppDelegate ()
 
 @property (weak) IBOutlet NSWindow *window;
@@ -26,9 +28,12 @@
 @property (weak) IBOutlet NSMenuItem *miAppIconLarge;
 @property (weak) IBOutlet NSMenuItem *miAppIconSmall;
 @property (weak) IBOutlet NSMenuItem *miAppIconSmallMono;
+@property (weak) IBOutlet NSMenuItem *miOrderAppName;
+@property (weak) IBOutlet NSMenuItem *miOrderLaunchTime;
 
 @property (assign) NSInteger iMenuTitle;
 @property (assign) NSInteger iIconSmall;
+@property (assign) NSInteger iOrder;
 
 @property (strong, retain) NSStatusItem *sbItem;
 @property (strong, retain) NSMutableArray *apps;
@@ -81,7 +86,7 @@
 {
     for (NSRunningApplication *app in self.apps) {
         if (app.ownsMenuBar) {
-           
+            
             switch (self.iMenuTitle) {
                 case 0: {
                     self.sbItem.title = app.localizedName;
@@ -135,6 +140,22 @@
     NSInteger selection = -1;
     
     NSInteger i = 0;
+    
+    switch (self.iOrder) {
+        case 0:
+            apps = [apps sortedArrayUsingComparator:^NSComparisonResult(NSRunningApplication *obj1, NSRunningApplication * obj2) {
+                NSStringCompareOptions compareOptions = (NSCaseInsensitiveSearch);
+                return [[obj1 localizedName] compare:[obj2 localizedName] options:compareOptions];
+            }];
+            break;
+        case 1:
+            apps = [apps sortedArrayUsingComparator:^NSComparisonResult(NSRunningApplication *obj1, NSRunningApplication * obj2) {
+                return [obj1 launchDate].timeIntervalSince1970 > [obj2 launchDate].timeIntervalSince1970;
+            }];
+            break;
+        default:
+            break;
+    }
     
     for (NSRunningApplication *app in apps) {
         if (app.activationPolicy != NSApplicationActivationPolicyRegular){
@@ -253,15 +274,18 @@
 #define UD [NSUserDefaults standardUserDefaults]
 #define UDMenuTitle @"MenuTitle"
 #define UDIconSmall @"IconSmall"
+#define UDOrder @"Order"
 
 - (void)loadUserDefaults {
     self.iMenuTitle = [UD integerForKey:UDMenuTitle];
     self.iIconSmall = [UD integerForKey:UDIconSmall];
+    self.iOrder = [UD integerForKey:UDOrder];
 }
 
 - (void)saveUserDefaults {
     [UD setInteger:self.iMenuTitle forKey:UDMenuTitle];
     [UD setInteger:self.iIconSmall forKey:UDIconSmall];
+    [UD setInteger:self.iOrder forKey:UDOrder];
 }
 
 - (void)recheckMenuItems {
@@ -274,6 +298,9 @@
     self.miAppIconLarge.state       = self.iIconSmall == 0 ? NSOnState : NSOffState;
     self.miAppIconSmall.state       = self.iIconSmall == 1 ? NSOnState : NSOffState;
     self.miAppIconSmallMono.state   = self.iIconSmall == 2 ? NSOnState : NSOffState;
+    
+    self.miOrderAppName.state      = self.iOrder == 0 ? NSOnState : NSOffState;
+    self.miOrderLaunchTime.state   = self.iOrder == 1 ? NSOnState : NSOffState;
 }
 
 
@@ -290,6 +317,15 @@
 
 - (IBAction)setIconSmall:(NSMenuItem *)sender {
     self.iIconSmall = sender.tag;
+    
+    [self changeMenuTitle];
+    [self recheckMenuItems];
+    [self createSubmenuOfSwitchMenu];
+    [self saveUserDefaults];
+}
+
+- (IBAction)setOrder:(NSMenuItem *)sender {
+    self.iOrder = sender.tag;
     
     [self changeMenuTitle];
     [self recheckMenuItems];
@@ -325,6 +361,30 @@
         if (app.ownsMenuBar) {
             [app terminate];
             break;
+        }
+    }
+}
+
+- (IBAction)openSwitchMenuItemsFolder:(id)sender {
+    NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
+    
+    BOOL result = [[NSWorkspace sharedWorkspace] openFile:folderPath];
+    if (!result) {
+        NSAlert *alert = [NSAlert alertWithMessageText:@"SwitchMenu Items Folder doesn't exist."
+                                         defaultButton:@"OK"
+                                       alternateButton:@"Cancel"
+                                           otherButton:nil
+                             informativeTextWithFormat:@"Would you like to make new SwitchMenu Items Folder?"];
+        
+        NSInteger result = [alert runModal];
+        
+        if (result == NSAlertDefaultReturn) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:folderPath
+                                      withIntermediateDirectories:YES
+                                                       attributes:nil
+                                                            error:NULL];
+            
+            [[NSWorkspace sharedWorkspace] openFile:folderPath];
         }
     }
 }

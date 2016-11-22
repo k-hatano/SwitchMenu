@@ -26,6 +26,8 @@
                 <outlet property="miMenuTitleIcon" destination="qTs-WN-dBC" id="cZP-4R-Xam"/>
                 <outlet property="miMenuTitleIconMono" destination="a7A-ac-S7b" id="8aN-mG-UUz"/>
                 <outlet property="miOptions" destination="E0w-1m-I95" id="RJe-MX-Rcc"/>
+                <outlet property="miOrderAppName" destination="knp-7g-65a" id="vMb-k8-gzK"/>
+                <outlet property="miOrderLaunchTime" destination="xes-we-Zde" id="pYL-nE-UQq"/>
                 <outlet property="miQuitApp" destination="UY7-mP-BSk" id="tjq-ph-oPn"/>
                 <outlet property="miShowAll" destination="0pC-wN-3TZ" id="Lw1-JK-rfa"/>
                 <outlet property="switchMenu" destination="yLx-0K-94h" id="RUF-J0-XcN"/>
@@ -785,7 +787,30 @@
                                     <action selector="setIconSmall:" target="Voe-Tx-rLC" id="JhN-LA-ujD"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="MRL-sc-YjH"/>
+                            <menuItem title="Order" enabled="NO" id="qaI-TG-65y">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem title="App Name" state="on" id="knp-7g-65a">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setOrder:" target="Voe-Tx-rLC" id="CcH-fy-F2Y"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Launch Time" tag="1" id="xes-we-Zde">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setOrder:" target="Voe-Tx-rLC" id="qPa-Ub-KCS"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="Jrt-Os-hKD"/>
+                            <menuItem title="Open SwitchMenu Items Folder" id="hbg-Rb-mfS">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openSwitchMenuItemsFolder:" target="Voe-Tx-rLC" id="LIp-lb-LbL"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="oZy-kI-ne2"/>
                             <menuItem title="Quit SwitchMenu" id="bpS-ey-YW8">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
