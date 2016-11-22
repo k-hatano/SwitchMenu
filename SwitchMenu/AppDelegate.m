@@ -37,6 +37,8 @@
 
 @property (strong, retain) NSStatusItem *sbItem;
 @property (strong, retain) NSMutableArray *apps;
+@property (strong, retain) NSMutableArray *items;
+
 
 @end
 
@@ -132,6 +134,41 @@
     BOOL enableHideOthers = NO;
     
     [self.switchMenu removeAllItems];
+    
+    self.items = [[NSMutableArray alloc] init];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
+    NSArray *menuItems = [fileManager contentsOfDirectoryAtPath:folderPath error:NULL];
+    NSInteger tag = 0;
+    if (menuItems && [menuItems count] > 0) {
+        for (NSString *fileName in menuItems) {
+            if ([fileName rangeOfString:@"."].location == 0) {
+                continue;
+            }
+            
+            NSMenuItem *item = [[NSMenuItem alloc] init];
+            item.title = fileName;
+            item.tag = tag;
+            item.target = self;
+            item.action = @selector(selectSwitchMenuFolderItem:);
+            
+            NSString *path = [[folderPath stringByAppendingString:@"/"] stringByAppendingString:fileName];
+            
+            item.image = [AppDelegate resizeImage:[[NSWorkspace sharedWorkspace] iconForFile:path]
+                                            small:(self.iIconSmall == 1 || self.iIconSmall == 2 ? YES : NO)
+                                       monochrome:(self.iIconSmall == 2 ? YES : NO)
+                                      translucent:NO];
+            
+            [self.items addObject:fileName];
+            [self.switchMenu addItem:item];
+            tag++;
+        }
+        if ([self.items count] > 0) {
+            [self.switchMenu addItem:[NSMenuItem separatorItem]];
+        }
+    }
+    
+    
     
     self.apps = [[NSMutableArray alloc] init];
     
@@ -388,5 +425,15 @@
         }
     }
 }
+
+- (IBAction)selectSwitchMenuFolderItem:(id)sender {
+    NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
+    
+    NSInteger tag = ((NSMenuItem *)sender).tag;
+    NSString *fileName = self.items[tag];
+    NSString *filePath = [[folderPath stringByAppendingString:@"/"] stringByAppendingString:fileName];
+    [[NSWorkspace sharedWorkspace] openFile:filePath];
+}
+
 
 @end
