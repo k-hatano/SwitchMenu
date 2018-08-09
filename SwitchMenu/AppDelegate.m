@@ -32,10 +32,12 @@
 @property (weak) IBOutlet NSMenuItem *miAppIconSmallMono;
 @property (weak) IBOutlet NSMenuItem *miOrderAppName;
 @property (weak) IBOutlet NSMenuItem *miOrderLaunchTime;
+@property (weak) IBOutlet NSMenuItem *miShowNumberOfWindows;
 
 @property (assign) NSInteger iMenuTitle;
 @property (assign) NSInteger iIconSmall;
 @property (assign) NSInteger iOrder;
+@property (assign) NSInteger iShowNumberOfWindows;
 
 @property (strong, retain) NSStatusItem *sbItem;
 @property (strong, retain) NSMutableArray *apps;
@@ -253,6 +255,9 @@
             break;
     }
     
+    CFArrayRef windowList = CGWindowListCopyWindowInfo((kCGWindowListOptionOnScreenOnly|kCGWindowListExcludeDesktopElements), kCGNullWindowID);
+    CFDictionaryRef windowDictionary;
+    
     for (NSRunningApplication *app in apps) {
         if (app.activationPolicy != NSApplicationActivationPolicyRegular){
             continue;
@@ -268,8 +273,37 @@
             }
         }
         
+        NSString *title = app.localizedName;
+        NSMutableArray *windows = [[NSMutableArray alloc] init];
+        
+        NSInteger numWindows = 0;
+        
+        for (CFIndex i = 0; i < CFArrayGetCount(windowList); i++){
+            windowDictionary = CFArrayGetValueAtIndex(windowList, i);
+            if ((int)CFDictionaryGetValue(windowDictionary, kCGWindowLayer) > 1000) {
+                continue;
+            }
+            
+            if ([(__bridge NSString *)CFDictionaryGetValue(windowDictionary, kCGWindowOwnerPID) integerValue]
+                == app.processIdentifier) {
+                NSString *windowTitle = (NSString *)CFDictionaryGetValue(windowDictionary, kCGWindowName);
+                if ([windowTitle length] <= 0) {
+                    windowTitle = @"(untitled)";
+                }
+                if ([windowTitle length] > 32) {
+                    windowTitle = [NSString stringWithFormat:@"%@...", [windowTitle substringWithRange:NSMakeRange(0, 32)]];
+                }
+                [windows addObject:windowTitle];
+                numWindows++;
+            }
+        }
+        
+        if (self.iShowNumberOfWindows > 0) {
+            title = [NSString stringWithFormat:@"%@ (%ld)",title,numWindows];
+        }
+        
         NSMenuItem *item = [[NSMenuItem alloc] init];
-        item.title = app.localizedName;
+        item.title = title;
         item.tag = i;
         
         BOOL translucent = NO;
@@ -310,6 +344,9 @@
         if (app.launchDate) {
             [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n",app.launchDate];
         }
+        if ([windows count] > 0) {
+            [tooltip appendFormat:@"\nWindows:\n%@\n", [windows componentsJoinedByString:@"\n"]];
+        }
         item.toolTip = tooltip;
         
         [self.apps addObject:app];
@@ -317,6 +354,8 @@
         
         i++;
     }
+    
+    CFBridgingRelease(windowList);
     
     self.miHideApp.title = [NSString stringWithFormat:@"Hide %@", currentApp.localizedName];
     self.miQuitApp.title = [NSString stringWithFormat:@"Quit %@", currentApp.localizedName];
@@ -379,17 +418,20 @@
 #define UDMenuTitle @"MenuTitle"
 #define UDIconSmall @"IconSmall"
 #define UDOrder @"Order"
+#define UDShowNumberOfWindows @"ShowNumberOfWindows"
 
 - (void)loadUserDefaults {
     self.iMenuTitle = [UD integerForKey:UDMenuTitle];
     self.iIconSmall = [UD integerForKey:UDIconSmall];
     self.iOrder = [UD integerForKey:UDOrder];
+    self.iShowNumberOfWindows = [UD integerForKey:UDShowNumberOfWindows];
 }
 
 - (void)saveUserDefaults {
     [UD setInteger:self.iMenuTitle forKey:UDMenuTitle];
     [UD setInteger:self.iIconSmall forKey:UDIconSmall];
     [UD setInteger:self.iOrder forKey:UDOrder];
+    [UD setInteger:self.iShowNumberOfWindows forKey:UDShowNumberOfWindows];
 }
 
 - (void)recheckMenuItems {
@@ -405,6 +447,8 @@
     
     self.miOrderAppName.state      = self.iOrder == 0 ? NSOnState : NSOffState;
     self.miOrderLaunchTime.state   = self.iOrder == 1 ? NSOnState : NSOffState;
+    
+    self.miShowNumberOfWindows.state  = self.iShowNumberOfWindows > 0 ? NSOnState : NSOffState;
 }
 
 
@@ -436,6 +480,16 @@
     [self createSubmenuOfSwitchMenu];
     [self saveUserDefaults];
 }
+
+- (IBAction)setShowNumberOfWindows:(NSMenuItem *)sender {
+    self.iShowNumberOfWindows = sender.state == NSOnState ? 0 : 1;
+    
+    [self changeMenuTitle];
+    [self recheckMenuItems];
+    [self createSubmenuOfSwitchMenu];
+    [self saveUserDefaults];
+}
+
 
 - (IBAction)actionHideApp:(id)sender {
     for (NSRunningApplication *app in self.apps) {

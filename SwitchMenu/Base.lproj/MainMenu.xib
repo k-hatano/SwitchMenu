@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G1108" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -30,6 +31,7 @@
                 <outlet property="miOrderLaunchTime" destination="xes-we-Zde" id="pYL-nE-UQq"/>
                 <outlet property="miQuitApp" destination="UY7-mP-BSk" id="tjq-ph-oPn"/>
                 <outlet property="miShowAll" destination="0pC-wN-3TZ" id="Lw1-JK-rfa"/>
+                <outlet property="miShowNumberOfWindows" destination="6So-3B-tbA" id="MSX-ep-PR9"/>
                 <outlet property="switchMenu" destination="yLx-0K-94h" id="RUF-J0-XcN"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -804,6 +806,13 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Jrt-Os-hKD"/>
+                            <menuItem title="Show Number of Windows" id="6So-3B-tbA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setShowNumberOfWindows:" target="Voe-Tx-rLC" id="VXa-wa-I7u"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="lQM-iE-qGD"/>
                             <menuItem title="Open SwitchMenu Items Folder" id="hbg-Rb-mfS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
