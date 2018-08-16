@@ -343,6 +343,8 @@
         [tooltip appendFormat:@"\nBundle Identifier:\n%@\n",app.bundleIdentifier];
         if (app.launchDate) {
             [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n",app.launchDate];
+        } else {
+            [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n", @"N/A"];
         }
         if ([windows count] > 0) {
             [tooltip appendFormat:@"\nWindows:\n%@\n", [windows componentsJoinedByString:@"\n"]];

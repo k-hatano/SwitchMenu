@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="17G65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
@@ -749,7 +749,7 @@
                                     <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="dwh-7k-wIT"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="App Icon (Monochrome)" tag="2" id="a7A-ac-S7b">
+                            <menuItem title="App Icon (Grayscale)" tag="2" id="a7A-ac-S7b">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="4jN-Jm-ZfX"/>
@@ -761,7 +761,7 @@
                                     <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="DmO-Fz-4c9"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="App Name and Icon (Monochrome)" tag="4" id="e6d-rC-hXz">
+                            <menuItem title="App Name and Icon (Grayscale)" tag="4" id="e6d-rC-hXz">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="AFU-n3-DRu"/>
@@ -783,7 +783,7 @@
                                     <action selector="setIconSmall:" target="Voe-Tx-rLC" id="j3m-yM-bN2"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Small (Monochrome)" tag="2" id="nlZ-ei-3A2">
+                            <menuItem title="Small (Grayscale)" tag="2" id="nlZ-ei-3A2">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="setIconSmall:" target="Voe-Tx-rLC" id="JhN-LA-ujD"/>
