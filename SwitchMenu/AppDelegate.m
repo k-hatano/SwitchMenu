@@ -126,6 +126,8 @@
                 default:
                     break;
             }
+            
+            self.sbItem.toolTip = [NSString stringWithFormat:@"%@ - SwitchMenu", app.localizedName];
             break;
         }
     }
@@ -164,7 +166,10 @@
     self.items = [[NSMutableArray alloc] init];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
-    NSArray *menuItems = [fileManager contentsOfDirectoryAtPath:folderPath error:NULL];
+    NSArray *menuItems = [[fileManager contentsOfDirectoryAtPath:folderPath error:NULL] sortedArrayUsingComparator:^NSComparisonResult(NSString *obj1, NSString * obj2) {
+        NSStringCompareOptions compareOptions = (NSCaseInsensitiveSearch);
+        return [obj1 compare:obj2 options:compareOptions];
+    }];
     NSInteger tag = 0;
     if (menuItems && [menuItems count] > 0) {
         for (NSString *fileName in menuItems) {
@@ -299,7 +304,11 @@
         }
         
         if (self.iShowNumberOfWindows > 0) {
-            title = [NSString stringWithFormat:@"%@ (%ld)",title,numWindows];
+            if (app.isHidden) {
+                title = [NSString stringWithFormat:@"%@ (-)",title];
+            } else {
+                title = [NSString stringWithFormat:@"%@ (%ld)",title,numWindows];
+            }
         }
         
         NSMenuItem *item = [[NSMenuItem alloc] init];
@@ -340,7 +349,7 @@
         
         NSMutableString *tooltip = [[NSMutableString alloc] init];
         [tooltip appendFormat:@"Full Path:\n%@\n",[app.bundleURL path]];
-        [tooltip appendFormat:@"\nBundle Identifier:\n%@\n",app.bundleIdentifier];
+        // [tooltip appendFormat:@"\nBundle Identifier:\n%@\n",app.bundleIdentifier];
         if (app.launchDate) {
             [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n",app.launchDate];
         } else {
@@ -381,11 +390,45 @@
 }
 
 - (void)menuSelected:(id)sender {
+    NSUInteger modifierFlags = [NSEvent modifierFlags];
+    
     NSMenuItem *item = sender;
     NSInteger tag = item.tag;
     
     NSRunningApplication *app = [self.apps objectAtIndex:tag];
-    [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+    if ((modifierFlags & NSAlternateKeyMask) && (modifierFlags & NSCommandKeyMask)) {
+        [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+        
+        for (NSRunningApplication *anApp in self.apps) {
+            if (![anApp isEqual:app]) {
+                [anApp hide];
+            }
+        }
+    } else if (modifierFlags & NSAlternateKeyMask) {
+        NSRunningApplication *currentApp = [NSRunningApplication currentApplication];
+        
+        for (NSRunningApplication *anApp in self.apps) {
+            if (anApp.ownsMenuBar) {
+                currentApp = anApp;
+                break;
+            }
+        }
+        
+        [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+        [currentApp hide];
+    } else if (modifierFlags & NSCommandKeyMask) {
+        [[NSWorkspace sharedWorkspace] selectFile:[app.bundleURL path]
+                         inFileViewerRootedAtPath:[[app.bundleURL path] stringByDeletingLastPathComponent]];
+    } else {
+        [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+    }
+    
+    if (modifierFlags & NSControlKeyMask) {
+        NSTask *task = [[NSTask alloc] init];
+        task.launchPath = @"/usr/bin/open";
+        task.arguments = @[@"-a", @"mission control", @"--args", @"2"];
+        [task launch];
+    }
 }
 
 + (NSImage *)resizeImage:(NSImage *)image small:(BOOL)small
@@ -552,11 +595,17 @@
 }
 
 - (IBAction)selectSwitchMenuFolderItem:(id)sender {
-    NSString *folderPath = [SWITCHMENU_ITEMS_FOLDER_PATH stringByExpandingTildeInPath];
+    NSUInteger modifierFlags = [NSEvent modifierFlags];
     
     NSInteger tag = ((NSMenuItem *)sender).tag;
     NSString *filePath = self.items[tag];
-    [[NSWorkspace sharedWorkspace] openFile:filePath];
+    
+    if (modifierFlags & NSCommandKeyMask) {
+        [[NSWorkspace sharedWorkspace] selectFile:filePath
+                         inFileViewerRootedAtPath:[filePath stringByDeletingLastPathComponent]];
+    } else {
+        [[NSWorkspace sharedWorkspace] openFile:filePath];
+    }
 }
 
 
