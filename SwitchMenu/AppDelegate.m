@@ -397,11 +397,24 @@
     
     NSRunningApplication *app = [self.apps objectAtIndex:tag];
     if ((modifierFlags & NSAlternateKeyMask) && (modifierFlags & NSCommandKeyMask)) {
-        [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
-        
+        NSInteger shownApps = 0;
         for (NSRunningApplication *anApp in self.apps) {
-            if (![anApp isEqual:app]) {
-                [anApp hide];
+            if (![anApp isEqual:app] && ![anApp isHidden]) {
+                shownApps++;
+            }
+        }
+        
+        if (shownApps <= 0) {
+            for (NSRunningApplication *anApp in self.apps) {
+                [anApp unhide];
+            }
+        } else {
+            [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+            
+            for (NSRunningApplication *anApp in self.apps) {
+                if (![anApp isEqual:app]) {
+                    [anApp hide];
+                }
             }
         }
     } else if (modifierFlags & NSAlternateKeyMask) {
@@ -424,6 +437,8 @@
     }
     
     if (modifierFlags & NSControlKeyMask) {
+        [app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+        
         NSTask *task = [[NSTask alloc] init];
         task.launchPath = @"/usr/bin/open";
         task.arguments = @[@"-a", @"mission control", @"--args", @"2"];
