@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="17G65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -21,6 +21,8 @@
                 <outlet property="miAppIconSmallMono" destination="nlZ-ei-3A2" id="vyI-Ot-zdF"/>
                 <outlet property="miHideApp" destination="Xqw-HY-SFm" id="hVJ-GJ-CPr"/>
                 <outlet property="miHideOthers" destination="WIX-8J-irt" id="ph5-8a-LD1"/>
+                <outlet property="miMenuTitleAllIcon" destination="M1U-46-yjx" id="BxD-nL-Cgl"/>
+                <outlet property="miMenuTitleAllIconMono" destination="nQV-cm-rbF" id="phB-zF-Z7L"/>
                 <outlet property="miMenuTitleAppName" destination="gcT-x2-bUe" id="ZcX-b9-bAZ"/>
                 <outlet property="miMenuTitleAppNameIcon" destination="G4Z-eH-z1E" id="6Y3-sc-SQw"/>
                 <outlet property="miMenuTitleAppNameIconMono" destination="e6d-rC-hXz" id="ZED-vg-mUT"/>
@@ -767,6 +769,18 @@
                                     <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="AFU-n3-DRu"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="All App Icons" tag="5" id="M1U-46-yjx">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="dDQ-gd-8hI"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="All App Icons (Grayscale)" tag="6" id="nQV-cm-rbF">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setMenuTitle:" target="Voe-Tx-rLC" id="iqK-3N-OKt"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="CYa-uN-xFL"/>
                             <menuItem title="App Icons" enabled="NO" id="lN1-go-d0M">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -833,7 +847,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="Db0-MA-GtS"/>
             </connections>
-            <point key="canvasLocation" x="540" y="783.5"/>
+            <point key="canvasLocation" x="370" y="642"/>
         </menu>
         <userDefaultsController representsSharedInstance="YES" id="9su-vE-kwj"/>
     </objects>

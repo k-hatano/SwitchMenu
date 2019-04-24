@@ -27,6 +27,8 @@
 @property (weak) IBOutlet NSMenuItem *miMenuTitleIconMono;
 @property (weak) IBOutlet NSMenuItem *miMenuTitleAppNameIcon;
 @property (weak) IBOutlet NSMenuItem *miMenuTitleAppNameIconMono;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleAllIcon;
+@property (weak) IBOutlet NSMenuItem *miMenuTitleAllIconMono;
 @property (weak) IBOutlet NSMenuItem *miAppIconLarge;
 @property (weak) IBOutlet NSMenuItem *miAppIconSmall;
 @property (weak) IBOutlet NSMenuItem *miAppIconSmallMono;
@@ -121,6 +123,16 @@
                     self.sbItem.title = app.localizedName;
                     self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
                                                       monochrome:YES translucent:NO];
+                    break;
+                }
+                case 5: {
+                    self.sbItem.title = @"";
+                    self.sbItem.image = [self makeAllAppsImageMonochrome:NO];
+                    break;
+                }
+                case 6: {
+                    self.sbItem.title = @"";
+                    self.sbItem.image = [self makeAllAppsImageMonochrome:YES];
                     break;
                 }
                 default:
@@ -472,6 +484,36 @@
     return resultImage;
 }
 
+- (NSImage *)makeAllAppsImageMonochrome:(BOOL)monochrome {
+    NSImage *tmpImage = [[NSImage alloc] initWithSize:NSMakeSize(SMALL_ICON_WIDTH * [self.apps count], SMALL_ICON_WIDTH)];
+    [tmpImage lockFocus];
+    
+    NSInteger appIndex = 0;
+    for (NSRunningApplication *app in self.apps) {
+        NSImage *appImage = app.icon;
+        BOOL translucent = [app isHidden];
+        
+        [appImage drawInRect:NSMakeRect(SMALL_ICON_WIDTH * appIndex, 0, SMALL_ICON_WIDTH, SMALL_ICON_WIDTH)
+                    fromRect:NSMakeRect(0, 0, appImage.size.width, appImage.size.height)
+                   operation:NSCompositeSourceOver
+                    fraction:translucent ? 0.3f : 1.0f];
+        
+        if ([app ownsMenuBar]) {
+            [[NSColor blackColor] set];
+            NSRectFill(NSMakeRect(SMALL_ICON_WIDTH * appIndex, 0, SMALL_ICON_WIDTH, 1));
+        }
+        
+        appIndex++;
+    }
+    [tmpImage unlockFocus];
+    
+    if (monochrome) {
+        tmpImage = [tmpImage grayscaleImage];
+    }
+    
+    return tmpImage;
+}
+
 #pragma mark - User Defaults
 
 #define UD [NSUserDefaults standardUserDefaults]
@@ -500,6 +542,8 @@
     self.miMenuTitleIconMono.state          = self.iMenuTitle == 2 ? NSOnState : NSOffState;
     self.miMenuTitleAppNameIcon.state       = self.iMenuTitle == 3 ? NSOnState : NSOffState;
     self.miMenuTitleAppNameIconMono.state   = self.iMenuTitle == 4 ? NSOnState : NSOffState;
+    self.miMenuTitleAllIcon.state           = self.iMenuTitle == 5 ? NSOnState : NSOffState;
+    self.miMenuTitleAllIconMono.state       = self.iMenuTitle == 6 ? NSOnState : NSOffState;
     
     self.miAppIconLarge.state       = self.iIconSmall == 0 ? NSOnState : NSOffState;
     self.miAppIconSmall.state       = self.iIconSmall == 1 ? NSOnState : NSOffState;
