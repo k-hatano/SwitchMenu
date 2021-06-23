@@ -35,11 +35,13 @@
 @property (weak) IBOutlet NSMenuItem *miOrderAppName;
 @property (weak) IBOutlet NSMenuItem *miOrderLaunchTime;
 @property (weak) IBOutlet NSMenuItem *miShowNumberOfWindows;
+@property (weak) IBOutlet NSMenuItem *miShow32BitOnly;
 
 @property (assign) NSInteger iMenuTitle;
 @property (assign) NSInteger iIconSmall;
 @property (assign) NSInteger iOrder;
 @property (assign) NSInteger iShowNumberOfWindows;
+@property (assign) NSInteger iShow32BitOnly;
 
 @property (strong, retain) NSStatusItem *sbItem;
 @property (strong, retain) NSMutableArray *apps;
@@ -97,7 +99,7 @@
             
             switch (self.iMenuTitle) {
                 case 0: {
-                    self.sbItem.title = app.localizedName;
+                    self.sbItem.title = [self appName:app];
                     self.sbItem.image = nil;
                     break;
                 }
@@ -114,13 +116,13 @@
                     break;
                 }
                 case 3: {
-                    self.sbItem.title = app.localizedName;
+                    self.sbItem.title = [self appName:app];
                     self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
                                                       monochrome:NO translucent:NO];
                     break;
                 }
                 case 4: {
-                    self.sbItem.title = app.localizedName;
+                    self.sbItem.title = [self appName:app];
                     self.sbItem.image = [AppDelegate resizeImage:app.icon small:YES
                                                       monochrome:YES translucent:NO];
                     break;
@@ -290,7 +292,7 @@
             }
         }
         
-        NSString *title = app.localizedName;
+        NSString *title = [self appName:app];
         NSMutableArray *windows = [[NSMutableArray alloc] init];
         
         NSInteger numWindows = 0;
@@ -361,6 +363,18 @@
         
         NSMutableString *tooltip = [[NSMutableString alloc] init];
         [tooltip appendFormat:@"Full Path:\n%@\n",[app.bundleURL path]];
+        NSString *arch;
+        switch (app.executableArchitecture) {
+            case NSBundleExecutableArchitectureI386:
+                arch = @"i386";
+                break;
+            case NSBundleExecutableArchitectureX86_64:
+                arch = @"x86_64";
+                break;
+            default:
+                arch = @"N/A";
+        }
+        [tooltip appendFormat:@"\nExecutable Architecture:\n%@\n", arch];
         // [tooltip appendFormat:@"\nBundle Identifier:\n%@\n",app.bundleIdentifier];
         if (app.launchDate) {
             [tooltip appendFormat:@"\nLaunch Date/Time:\n%@\n",app.launchDate];
@@ -514,6 +528,14 @@
     return tmpImage;
 }
 
+- (NSString *)appName:(NSRunningApplication *)app {
+    if (self.iShow32BitOnly && [app executableArchitecture] == NSBundleExecutableArchitectureI386) {
+        return [app.localizedName stringByAppendingString:@" (32-bit)"];
+    } else {
+        return app.localizedName;
+    }
+}
+
 #pragma mark - User Defaults
 
 #define UD [NSUserDefaults standardUserDefaults]
@@ -521,12 +543,14 @@
 #define UDIconSmall @"IconSmall"
 #define UDOrder @"Order"
 #define UDShowNumberOfWindows @"ShowNumberOfWindows"
+#define UDShow32BitOnly @"Show32BitOnly"
 
 - (void)loadUserDefaults {
     self.iMenuTitle = [UD integerForKey:UDMenuTitle];
     self.iIconSmall = [UD integerForKey:UDIconSmall];
     self.iOrder = [UD integerForKey:UDOrder];
     self.iShowNumberOfWindows = [UD integerForKey:UDShowNumberOfWindows];
+    self.iShow32BitOnly = [UD integerForKey:UDShowNumberOfWindows];
 }
 
 - (void)saveUserDefaults {
@@ -534,6 +558,7 @@
     [UD setInteger:self.iIconSmall forKey:UDIconSmall];
     [UD setInteger:self.iOrder forKey:UDOrder];
     [UD setInteger:self.iShowNumberOfWindows forKey:UDShowNumberOfWindows];
+    [UD setInteger:self.iShow32BitOnly forKey:UDShow32BitOnly];
 }
 
 - (void)recheckMenuItems {
@@ -553,6 +578,7 @@
     self.miOrderLaunchTime.state   = self.iOrder == 1 ? NSOnState : NSOffState;
     
     self.miShowNumberOfWindows.state  = self.iShowNumberOfWindows > 0 ? NSOnState : NSOffState;
+    self.miShow32BitOnly.state  = self.iShow32BitOnly > 0 ? NSOnState : NSOffState;
 }
 
 
@@ -587,6 +613,15 @@
 
 - (IBAction)setShowNumberOfWindows:(NSMenuItem *)sender {
     self.iShowNumberOfWindows = sender.state == NSOnState ? 0 : 1;
+    
+    [self changeMenuTitle];
+    [self recheckMenuItems];
+    [self createSubmenuOfSwitchMenu];
+    [self saveUserDefaults];
+}
+
+- (IBAction)setShow32BitOnly:(NSMenuItem *)sender {
+    self.iShow32BitOnly = sender.state == NSOnState ? 0 : 1;
     
     [self changeMenuTitle];
     [self recheckMenuItems];
